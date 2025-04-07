@@ -11,15 +11,15 @@ export interface CanComponentDeactivate{
   standalone:true,
   template: `
     <div>
-    <a routerLink="/">Go to Home</a>
       <h3>Child Component</h3>
       <p>Received from parent: {{ parentData }}</p>
       <button (click)="notifyParent()">Notify Parent</button>
 
-      <button (click)="navigateAway()">Go to Home (Programmatic)</button>
+      <button (click)="navigateAway()">Go to Home</button>
 
       <button (click)="toggleUnsavedChanges()">Toggle Unsaved changes ({{ hasUnsavedChanges }})
       </button>
+      <button (click)="goToProduct()">View Product 123</button>
     </div>
   `
 })
@@ -43,14 +43,20 @@ export class ChildComponent implements CanComponentDeactivate{
     this.hasUnsavedChanges = !this.hasUnsavedChanges;
   }
 
-  navigateAway() {
-    this.router.navigate(['/']);
-  }
-
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean{
     if(this.hasUnsavedChanges){
       return window.confirm('You have unsaved changes! do you want to leave?');
     }
     return true;
+  }
+
+  navigateAway() {
+    this.router.navigate(['/']);
+  }
+
+  goToProduct(){
+    this.router.navigate(['/product',123], {
+      queryParams: { ref: 'email' }
+    });
   }
 }
