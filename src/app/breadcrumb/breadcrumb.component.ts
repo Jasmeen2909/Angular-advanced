@@ -1,102 +1,108 @@
-import { Component, OnInit, AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-interface Breadcrumb {
+interface IBreadcrumb {
   label: string;
   url: string;
 }
 
 @Component({
   selector: 'app-breadcrumb',
-  // Use a very simple template—a container for our breadcrumb HTML.
-  template: `<nav id="breadcrumbContainer"></nav>`,
-  styles: [`
-    nav {
-      padding: 10px;
-      background: #f8f8f8;
-      font-family: Arial, sans-serif;
-    }
-    a {
-      border: 1px solid red;
-      padding: 4px 8px;
-      text-decoration: none;
-      margin-right: 5px;
-      cursor: pointer;
-      color: blue;
-    }
-  `]
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <nav class="breadcrumb-container">
+      <ul class="breadcrumb-list">
+        <li *ngFor="let crumb of breadcrumbs; let last = last">
+          <ng-container *ngIf="!last; else currentRoute">
+            <a [routerLink]="crumb.url">{{ crumb.label }}</a>
+            <span class="separator">/</span>
+          </ng-container>
+          <ng-template #currentRoute>
+            <span class="current">{{ crumb.label }}</span>
+          </ng-template>
+        </li>
+      </ul>
+    </nav>
+  `,
+  styles: `
+  .breadcrumb-container {
+  padding: 10px;
+  background: #eee;
+  font-family: Arial, sans-serif;
+  margin-bottom: 20px;
+}
+.breadcrumb-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.breadcrumb-list li {
+  margin-right: 8px;
+}
+.breadcrumb-list a {
+  text-decoration: none;
+  color: blue;
+  border: 1px solid red;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.separator {
+  margin-right: 8px;
+}
+.current {
+  font-weight: bold;
+  color: black;
+  padding: 4px 8px;
+}
+  `,
 })
-export class BreadcrumbComponent implements OnInit, AfterViewInit {
+export class BreadcrumbComponent implements OnInit {
+  breadcrumbs: IBreadcrumb[] = [];
 
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private renderer: Renderer2,
-    private el: ElementRef
-  ) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    // Rebuild breadcrumbs on every NavigationEnd event.
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.buildBreadcrumbs();
+        this.breadcrumbs = this.buildBreadcrumbs(this.activatedRoute.root, '');
+        console.log('Breadcrumbs:', this.breadcrumbs);
       });
+
+    this.breadcrumbs = this.buildBreadcrumbs(this.activatedRoute.root, '');
   }
 
-  ngAfterViewInit(): void {
-    // Initial build after the view loads.
-    this.buildBreadcrumbs();
-  }
-
-  // Build breadcrumbs without using Angular template directives.
   buildBreadcrumbs(
     route: ActivatedRoute,
-    url: string = '',
-    breadcrumbs: Breadcrumb[] = []
-  ): Breadcrumb[] {
-    console.log('Visiting route:', route.snapshot.url.map(s => s.path).join('/'));
-    const children = route.children;
-    if (!children.length) {
-      console.log('No children, returning', breadcrumbs);
+    url: string,
+    breadcrumbs: IBreadcrumb[] = []
+  ): IBreadcrumb[] {
+    const children: ActivatedRoute[] = route.children;
+
+    if (children.length === 0) {
       return breadcrumbs;
     }
-  
-    for (const child of children) {
-      const routeURL = child.snapshot.url.map(segment => segment.path).join('/');
-      const nextUrl = routeURL ? `${url}/${routeURL}` : url;
-      const label = child.snapshot.data['breadcrumb'];
-      console.log('Child routeURL:', routeURL, 'Label:', label);
-      if (label) {
-        breadcrumbs.push({ label, url: nextUrl });
-      }
-      return this.buildBreadcrumbs(child, nextUrl, breadcrumbs);
-    }
-    return breadcrumbs;
-  }
-  
 
-  // Recursive function to build an array of breadcrumbs.
-  getBreadcrumbs(
-    route: ActivatedRoute,
-    url: string = '',
-    breadcrumbs: Breadcrumb[] = []
-  ): Breadcrumb[] {
-    console.log('Visiting route:', route.snapshot.url.map(s => s.path).join('/'), 'Data:', route.snapshot.data);
-    const label = route.snapshot.data['breadcrumb'];
-    const routeURL = route.snapshot.url.map(segment => segment.path).join('/');
-    const nextUrl = routeURL ? (url ? `${url}/${routeURL}` : `/${routeURL}`) : url;
-  
-    if (label) {
-      breadcrumbs.push({ label, url: nextUrl });
+    for (const child of children) {
+      const routeURL = child.snapshot.url
+        .map((segment) => segment.path)
+        .join('/');
+
+      const nextUrl = routeURL ? url + '/' + routeURL : url;
+
+      const label = child.snapshot.data['breadcrumb'];
+      if (label) {
+        breadcrumbs.push({ label, url: nextUrl || '/' });
+      }
+
+      this.buildBreadcrumbs(child, nextUrl, breadcrumbs);
     }
-  
-    route.children.forEach(child => {
-      breadcrumbs = this.getBreadcrumbs(child, nextUrl, breadcrumbs);
-    });
-  
     return breadcrumbs;
   }
-  
 }
