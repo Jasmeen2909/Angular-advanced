@@ -1,1 +1,21 @@
-<p>child works!</p>
+<mat-card class="child-card">
+    <mat-card-title>Child Component</mat-card-title>
+    <mat-card-content>
+      <p>Received from parent: <strong>{{ parentData }}</strong></p>
+  
+      <div class="button-group">
+        <button mat-raised-button color="accent" (click)="notifyParent()">
+          Notify Parent
+        </button>
+  
+        <button mat-raised-button color="warn" (click)="toggleUnsavedChanges()">
+          Toggle Unsaved Changes ({{ hasUnsavedChanges }})
+        </button>
+  
+        <button mat-raised-button color="primary" (click)="goToProduct()">
+          View Product 123
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  

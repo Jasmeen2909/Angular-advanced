@@ -1,0 +1,22 @@
+.parent-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 700px;
+    margin: 40px auto; 
+    padding: 0 20px;
+  }
+  
+  .demo-card {
+    padding: 10px;
+  }
+  
+  mat-card-title {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    margin: 10px 0;
+  }
+  

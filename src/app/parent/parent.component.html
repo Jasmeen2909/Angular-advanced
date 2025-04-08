@@ -1,1 +1,46 @@
-<p>parent works!</p>
+<div class="parent-container">
+
+    <!-- Parent-Child Demo Card -->
+    <mat-card class="demo-card">
+      <mat-card-title>Parent-Child Communication</mat-card-title>
+      <mat-card-content>
+        <p>Data sent to child: <strong>{{ messageToChild }}</strong></p>
+        
+        <!-- Child component -->
+        <app-child 
+          [parentData]="messageToChild" 
+          (childEvent)="handleChildEvent($event)">
+        </app-child>
+        
+        <p *ngIf="childMessage">Message from Child: <strong>{{ childMessage }}</strong></p>
+      </mat-card-content>
+    </mat-card>
+  
+    <!-- Auto-Focus Demo Card -->
+    <mat-card class="demo-card">
+      <mat-card-title>Auto-Focus Demo</mat-card-title>
+      <mat-card-content>
+        <p>Below input will automatically focus when the page loads:</p>
+        <input matInput placeholder="I will auto-focus" appAutoFocus />
+      </mat-card-content>
+    </mat-card>
+  
+    <!-- Modal Demo Card -->
+    <mat-card class="demo-card">
+      <mat-card-title>Modal Demo</mat-card-title>
+      <mat-card-content>
+        <p>Click the button to open a reusable modal component:</p>
+        <button mat-raised-button color="primary" (click)="openModal()">Open Modal</button>
+        
+        <app-modal [(isOpen)]="modalOpen">
+          <h3>Modal Title</h3>
+          <p>This is some modal content inside the parent component's projection.</p>
+          <button mat-stroked-button color="warn" (click)="modalOpen=false">
+            Close Modal
+          </button>
+        </app-modal>
+      </mat-card-content>
+    </mat-card>
+  
+  </div>
+  

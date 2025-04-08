@@ -1,0 +1,15 @@
+.product-card {
+    max-width: 600px;   
+    margin: 40px auto;  
+    padding: 20px;      
+  }
+  
+  mat-card-title {
+    font-size: 1.4rem;  
+    margin-bottom: 10px;
+  }
+  
+  p {
+    margin: 10px 0; 
+  }
+  

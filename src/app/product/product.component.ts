@@ -1,24 +1,23 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-product',
-  template: `
-    <div>
-      <h2>Product Details:</h2>
-      <p>Product Id: {{productId}}</p>
-      <p>Reference: {{ref}}</p>
-    </div>
-  `
+  standalone: true,
+  imports: [CommonModule, MatCardModule],
+  templateUrl: './product.component.html',
+  styleUrls: ['./product.component.css']
 })
-export class ProductComponent implements OnInit{
+export class ProductComponent implements OnInit {
   productId!: string;
   ref!: string;
 
-  constructor(private route: ActivatedRoute){}
+  constructor(private route: ActivatedRoute) {}
+
   ngOnInit(): void {
     this.productId = this.route.snapshot.paramMap.get('id')!;
     this.ref = this.route.snapshot.queryParamMap.get('ref')!;
   }
-
 }
